@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
   addressContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 40,
+    marginBottom: 10,
   },
   addressBlock: {
     fontSize: 10,
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   table: {
-    marginBottom: 30,
+    marginBottom: 20,
   },
   tableHeader: {
     flexDirection: "row",
@@ -152,8 +152,8 @@ const MyDocument = ({ invoice }: FactureProps) => {
           <View>
             <Image style={styles.logo} src={myam.src} />
             <Text style={styles.addressBlock}>
-              Abidajan, Côte d'Ivoire{"\n"}Tél: 0086 186 2097 5453
-              {"\n"}Tél: 0086 188 0207 2454{"\n"}Tél: 00225 05 64 91 92 16
+              Abidajan, Côte d'Ivoire{"\n"}Tél: 0086 186 2097 5453 - 0086 188
+              0207 2454{"\n"}Tél: 00225 05 64 91 92 16
             </Text>
           </View>
           <View>
@@ -215,16 +215,23 @@ const MyDocument = ({ invoice }: FactureProps) => {
             <Text style={styles.summaryTitle}>TVA 20%</Text>
             <Text>0</Text>
           </View>
-          {/* <View style={styles.summaryRow}>
-            <Text style={styles.summaryTitle}>REMISE 5%</Text>
-            <Text>{discount.toFixed(2)} €</Text>
-          </View> */}
+
           <View style={styles.totalContainer}>
             <Text style={styles.totalText}>
               TOTAL : {subtotal.toFixed(2)} {invoice.items[0]?.unit}
             </Text>
           </View>
         </View>
+
+        <View
+          style={{
+            marginTop: 10,
+            width: "100%",
+            height: 1,
+            borderWidth: 0.5,
+            borderColor: "#000",
+          }}
+        ></View>
 
         <View style={styles.footer}>
           <View style={styles.footerContent}>

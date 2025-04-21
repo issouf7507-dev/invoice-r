@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { InvoiceDetail } from "@/components/InvoiceDetail";
 
@@ -25,19 +25,21 @@ interface Invoice {
 export default function InvoiceDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const router = useRouter();
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const { id } = use(params);
+
   useEffect(() => {
     fetchInvoice();
-  }, [params.id]);
+  }, [id]);
 
   const fetchInvoice = async () => {
     try {
-      const response = await fetch(`/api/invoices/${params.id}`);
+      const response = await fetch(`/api/invoices/${id}`);
       if (!response.ok) {
         throw new Error("Failed to fetch invoice");
       }
