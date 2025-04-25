@@ -138,6 +138,11 @@ const styles = StyleSheet.create({
   },
 });
 
+// Fonction pour formater les nombres avec séparateurs de milliers
+const formatNumber = (num: number) => {
+  return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+};
+
 // Create Document Component
 const MyDocument = ({ invoice }: FactureProps) => {
   const subtotal = invoice.items.reduce((sum, item) => sum + item.amount, 0);
@@ -195,12 +200,12 @@ const MyDocument = ({ invoice }: FactureProps) => {
             <View key={item.id} style={styles.tableRow}>
               <Text style={styles.description}>{item.description}</Text>
               <Text style={styles.unitPrice}>
-                {item.unitPrice.toFixed(2)} {item.unit}
+                {formatNumber(item.unitPrice)} {item.unit}
               </Text>
               <Text style={styles.quantity}>{item.quantity}</Text>
               <Text style={styles.quantity}>{item.weight}</Text>
               <Text style={styles.amount}>
-                {item.amount.toFixed(2)} {item.unit}
+                {formatNumber(item.amount)} {item.unit}
               </Text>
             </View>
           ))}
@@ -208,25 +213,62 @@ const MyDocument = ({ invoice }: FactureProps) => {
 
         <View style={styles.summaryContainer}>
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryTitle}>SOUS-TOTAL</Text>
+            <Text style={styles.summaryTitle}>MONTANT HT</Text>
             <Text>
-              {subtotal.toFixed(2)} {invoice.items[0]?.unit}
+              {formatNumber(subtotal)} {invoice.items[0]?.unit}
             </Text>
           </View>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryTitle}>TVA 20%</Text>
             <Text>0</Text>
           </View>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryTitle}>Montant payé</Text>
+            <Text>
+              {formatNumber(invoice.paidAmount)} {invoice.items[0]?.unit}
+            </Text>
+          </View>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryTitle}>Reste à payer</Text>
+            <Text>
+              {formatNumber(invoice.remainingAmount)} {invoice.items[0]?.unit}
+            </Text>
+          </View>
 
           <View style={styles.totalContainer}>
             <Text style={styles.totalText}>
-              TOTAL : {subtotal.toFixed(2)} {invoice.items[0]?.unit}
+              TOTAL : {formatNumber(invoice.paidAmount)}{" "}
+              {invoice.items[0]?.unit}
             </Text>
           </View>
         </View>
 
-        <View style={{marginTop: 5}}>
-        <View style={styles.footerContent}>
+        {invoice.payments && invoice.payments.length > 0 && (
+          <View style={{ marginTop: 20 }}>
+            <Text style={{ fontSize: 12, marginBottom: 10, color: "#4338ca" }}>
+              Historique des paiements
+            </Text>
+            <View style={styles.table}>
+              <View style={styles.tableHeader}>
+                <Text style={styles.description}>Date</Text>
+                <Text style={styles.amount}>Montant</Text>
+              </View>
+              {invoice.payments.map((payment) => (
+                <View key={payment.id} style={styles.tableRow}>
+                  <Text style={styles.description}>
+                    {new Date(payment.paymentDate).toLocaleDateString()}
+                  </Text>
+                  <Text style={styles.amount}>
+                    {formatNumber(payment.amount)} {invoice.items[0]?.unit}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
+        <View style={{ marginTop: 5 }}>
+          <View style={styles.footerContent}>
             <View style={styles.footerSection}>
               <Text style={styles.footerTitle}>Questions?</Text>
               <Text>

@@ -37,9 +37,7 @@ export function InvoiceList({
   const [sortBy, setSortBy] = useState<"date" | "name" | "amount">("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-
   console.log(invoices);
-  
 
   const filteredInvoices = invoices
     .filter(
@@ -73,6 +71,10 @@ export function InvoiceList({
       setSortBy(field);
       setSortOrder("asc");
     }
+  };
+
+  const formatNumber = (num: number) => {
+    return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
   };
 
   return (
@@ -140,6 +142,9 @@ export function InvoiceList({
               >
                 Total {sortBy === "amount" && (sortOrder === "asc" ? "↑" : "↓")}
               </TableHead>
+              <TableHead className="text-right">Payé</TableHead>
+              <TableHead className="text-right">Reste</TableHead>
+              <TableHead className="text-right">Statut</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -154,21 +159,55 @@ export function InvoiceList({
                 </TableCell>
                 <TableCell>{invoice.clientPhone}</TableCell>
                 <TableCell>
-                  {invoice.items.reduce((sum, item) => sum + item.weight, 0).toFixed(2)} kg
-                </TableCell>
-                <TableCell className="text-right">
                   {invoice.items
-                    .reduce((sum, item) => sum + item.amount, 0)
-                    .toFixed(2)}
+                    .reduce((sum, item) => sum + item.weight, 0)
+                    .toFixed(2)}{" "}
+                  kg
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onSelectInvoiceAction(invoice)}
+                  {/* {invoice.totalAmount.toFixed(2)} */}
+                  {formatNumber(invoice.totalAmount)}
+                </TableCell>
+                <TableCell className="text-right">
+                  {/* {invoice.paidAmount.toFixed(2)} */}
+                  {formatNumber(invoice.paidAmount)}
+                </TableCell>
+                <TableCell className="text-right">
+                  {/* {invoice.remainingAmount.toFixed(2)} */}
+                  {formatNumber(invoice.remainingAmount)}
+                </TableCell>
+                <TableCell className="text-right">
+                  <span
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      invoice.isPaid
+                        ? "bg-green-100 text-green-800"
+                        : "bg-yellow-100 text-yellow-800"
+                    }`}
                   >
-                    Voir
-                  </Button>
+                    {invoice.isPaid ? "Soldée" : "En attente"}
+                  </span>
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onSelectInvoiceAction(invoice)}
+                    >
+                      Voir
+                    </Button>
+                    {!invoice.isPaid && (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() =>
+                          router.push(`/invoices/${invoice.id}/pay`)
+                        }
+                      >
+                        Payer
+                      </Button>
+                    )}
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

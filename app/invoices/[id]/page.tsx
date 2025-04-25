@@ -4,6 +4,7 @@ import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { InvoiceDetail } from "@/components/InvoiceDetail";
 import { Loader2 } from "lucide-react";
+import { Invoice } from "@/types/invoice";
 
 interface InvoiceItem {
   id: number;
@@ -15,21 +16,11 @@ interface InvoiceItem {
   weight: number;
 }
 
-interface Invoice {
-  id: number;
-  clientName: string;
-  clientAddress: string;
-  clientPhone: string;
-  items: InvoiceItem[];
-  createdAt: string;
-}
-
 export default function InvoiceDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [loading, setLoading] = useState(true);
 

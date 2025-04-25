@@ -23,6 +23,10 @@ export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
   const router = useRouter();
   const total = invoice.items.reduce((sum, item) => sum + item.amount, 0);
 
+  const formatNumber = (num: number) => {
+    return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  };
+
   const handleDelete = async () => {
     if (window.confirm("Êtes-vous sûr de vouloir supprimer cette facture ?")) {
       try {
@@ -82,6 +86,9 @@ export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
             </h2>
             <p>Numéro: #{invoice.id}</p>
             <p>Date: {new Date(invoice.createdAt).toLocaleDateString()}</p>
+            <p>
+              Statut: {invoice.isPaid ? "Soldée" : "En attente de paiement"}
+            </p>
           </div>
         </div>
 
@@ -90,10 +97,18 @@ export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
             <TableRow>
               <TableHead className="dark:text-gray-400">Description</TableHead>
               <TableHead className="dark:text-gray-400">Unité</TableHead>
-              <TableHead className="text-right dark:text-gray-400">Quantité</TableHead>
-              <TableHead className="text-right dark:text-gray-400">Poids</TableHead>
-              <TableHead className="text-right dark:text-gray-400">Prix unitaire</TableHead>
-              <TableHead className="text-right dark:text-gray-400">Montant</TableHead>
+              <TableHead className="text-right dark:text-gray-400">
+                Quantité
+              </TableHead>
+              <TableHead className="text-right dark:text-gray-400">
+                Poids
+              </TableHead>
+              <TableHead className="text-right dark:text-gray-400">
+                Prix unitaire
+              </TableHead>
+              <TableHead className="text-right dark:text-gray-400">
+                Montant
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -104,25 +119,83 @@ export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
                 <TableCell className="text-right">{item.quantity}</TableCell>
                 <TableCell className="text-right">{item.weight}</TableCell>
                 <TableCell className="text-right">
-                  {item.unitPrice.toFixed(2)}
+                  {/* {item.unitPrice.toFixed(2)} */}
+                  {formatNumber(item.unitPrice)}
                 </TableCell>
                 <TableCell className="text-right">
-                  {item.amount.toFixed(2)}
+                  {/* {item.amount.toFixed(2)} */}
+                  {formatNumber(item.amount)}
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
           <TableFooter>
             <TableRow>
-              <TableCell colSpan={5} className="text-right font-bold text-black">
+              <TableCell
+                colSpan={5}
+                className="text-right font-bold text-black"
+              >
                 Total
               </TableCell>
               <TableCell className="text-right font-bold text-black">
-                {total.toFixed(2)}
+                {/* {invoice.totalAmount.toFixed(2)} */}
+                {formatNumber(invoice.totalAmount)}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell
+                colSpan={5}
+                className="text-right font-bold text-black"
+              >
+                Montant payé
+              </TableCell>
+              <TableCell className="text-right font-bold text-black">
+                {/* {invoice.paidAmount.toFixed(2)} */}
+                {formatNumber(invoice.paidAmount)}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell
+                colSpan={5}
+                className="text-right font-bold text-black"
+              >
+                Reste à payer
+              </TableCell>
+              <TableCell className="text-right font-bold text-black">
+                {/* {invoice.remainingAmount.toFixed(2)} */}
+                {formatNumber(invoice.remainingAmount)}
               </TableCell>
             </TableRow>
           </TableFooter>
         </Table>
+
+        {invoice.payments && invoice.payments.length > 0 && (
+          <div className="mt-8">
+            <h3 className="text-lg font-semibold mb-4">
+              Historique des paiements
+            </h3>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead className="text-right">Montant</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {invoice.payments.map((payment) => (
+                  <TableRow key={payment.id}>
+                    <TableCell>
+                      {new Date(payment.paymentDate).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {formatNumber(payment.amount)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
 
         <div className="mt-8 text-center text-sm text-gray-500 print:hidden">
           <p>

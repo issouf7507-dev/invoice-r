@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { InvoiceList } from "@/components/InvoiceList";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { Invoice } from "@/types/invoice";
 
 import {
   Popover,
@@ -27,15 +28,6 @@ interface InvoiceItem {
   unitPrice: number;
   amount: number;
   weight: number;
-}
-
-interface Invoice {
-  id: number;
-  clientName: string;
-  clientAddress: string;
-  clientPhone: string;
-  items: InvoiceItem[];
-  createdAt: string;
 }
 
 export default function InvoicesPage() {

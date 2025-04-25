@@ -18,6 +18,7 @@ export function InvoiceForm({ onSubmitAction }: InvoiceFormProps) {
   const [clientName, setClientName] = useState("");
   const [clientAddress, setClientAddress] = useState("");
   const [clientPhone, setClientPhone] = useState("");
+  const [paidAmount, setPaidAmount] = useState(0);
   const [items, setItems] = useState<Invoice["items"]>([
     {
       id: getRandomIntUniquePerDay(1, 1000),
@@ -75,6 +76,9 @@ export function InvoiceForm({ onSubmitAction }: InvoiceFormProps) {
     e.preventDefault();
 
     try {
+      const totalAmount = items.reduce((sum, item) => sum + item.amount, 0);
+      const remainingAmount = totalAmount - paidAmount;
+
       const response = await fetch("/api/invoices", {
         method: "POST",
         headers: {
@@ -85,6 +89,10 @@ export function InvoiceForm({ onSubmitAction }: InvoiceFormProps) {
           clientAddress,
           clientPhone,
           items,
+          totalAmount,
+          paidAmount,
+          remainingAmount,
+          isPaid: remainingAmount <= 0,
         }),
       });
 
@@ -180,7 +188,6 @@ export function InvoiceForm({ onSubmitAction }: InvoiceFormProps) {
                 <Input
                   type="number"
                   value={item.quantity}
-                  
                   onChange={(e) =>
                     updateItem(index, "quantity", Number(e.target.value))
                   }
@@ -205,7 +212,7 @@ export function InvoiceForm({ onSubmitAction }: InvoiceFormProps) {
                 <Input
                   type="number"
                   value={item.unitPrice}
-                    min="0"
+                  min="0"
                   onChange={(e) =>
                     updateItem(index, "unitPrice", Number(e.target.value))
                   }
@@ -214,7 +221,7 @@ export function InvoiceForm({ onSubmitAction }: InvoiceFormProps) {
               </div>
               <div>
                 <Label className="mb-1">Montant</Label>
-                <Input type="number" value={item.amount}      min="0" readOnly />
+                <Input type="number" value={item.amount} min="0" readOnly />
               </div>
 
               {items.length > 1 && (
@@ -225,13 +232,40 @@ export function InvoiceForm({ onSubmitAction }: InvoiceFormProps) {
             </div>
           ))}
         </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label className="mb-1">Montant total</Label>
+            <Input
+              type="number"
+              value={items.reduce((sum, item) => sum + item.amount, 0)}
+              readOnly
+            />
+          </div>
+          <div>
+            <Label className="mb-1">Montant payé</Label>
+            <Input
+              type="number"
+              value={paidAmount}
+              onChange={(e) => setPaidAmount(Number(e.target.value))}
+              min="0"
+            />
+          </div>
+        </div>
+
         <div className="flex items-center justify-between">
           <Button type="button" onClick={addItem}>
             Ajouter un article
           </Button>
 
           <div className="flex items-center gap-2">
-            <Button variant="outline" type="button" onClick={() => window.location.href = "/invoices"}>Retour</Button>
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => (window.location.href = "/invoices")}
+            >
+              Retour
+            </Button>
             <Button type="submit">Créer la facture</Button>
           </div>
         </div>

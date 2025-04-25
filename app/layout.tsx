@@ -33,3 +33,5 @@ export default function RootLayout({
     </html>
   );
 }
+
+// PORT=3001 pm2 start npm --name facture-app -- start
