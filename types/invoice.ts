@@ -5,6 +5,8 @@ export interface InvoiceItem {
   quantity: number;
   unitPrice: number;
   amount: number;
+  /** Poids en kilogrammes (nombre à virgule flottante) */
+  weight: number;
 }
 
 export interface Invoice {

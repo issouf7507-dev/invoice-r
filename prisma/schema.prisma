@@ -29,6 +29,7 @@ model InvoiceItem {
   quantity    Int
   unitPrice   Float
   amount      Float
+  weight      Float    @default(0.0)
   invoice     Invoice  @relation(fields: [invoiceId], references: [id])
   invoiceId   Int
   createdAt   DateTime @default(now())

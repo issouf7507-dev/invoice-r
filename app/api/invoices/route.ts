@@ -18,6 +18,7 @@ export async function POST(request: Request) {
             quantity: item.quantity,
             unitPrice: item.unitPrice,
             amount: item.amount,
+            weight: item.weight
           })),
         },
       },

@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { InvoiceDetail } from "@/components/InvoiceDetail";
+import { Loader2 } from "lucide-react";
 
 interface InvoiceItem {
   id: number;
@@ -11,6 +12,7 @@ interface InvoiceItem {
   quantity: number;
   unitPrice: number;
   amount: number;
+  weight: number;
 }
 
 interface Invoice {
@@ -27,7 +29,7 @@ export default function InvoiceDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const router = useRouter();
+
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -54,9 +56,10 @@ export default function InvoiceDetailPage({
 
   if (loading) {
     return (
-      <main className="min-h-screen p-8">
-        <div className="flex justify-center items-center">
+      <main className="min-h-screen p-8 flex items-center justify-center">
+        <div className="flex justify-center items-center flex-col">
           <p>Chargement...</p>
+          <Loader2 />
         </div>
       </main>
     );

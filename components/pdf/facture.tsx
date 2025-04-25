@@ -188,6 +188,7 @@ const MyDocument = ({ invoice }: FactureProps) => {
             <Text style={styles.description}>Description</Text>
             <Text style={styles.unitPrice}>Prix unitaire</Text>
             <Text style={styles.quantity}>Qté</Text>
+            <Text style={styles.quantity}>Poids</Text>
             <Text style={styles.amount}>Total</Text>
           </View>
           {invoice.items.map((item) => (
@@ -197,6 +198,7 @@ const MyDocument = ({ invoice }: FactureProps) => {
                 {item.unitPrice.toFixed(2)} {item.unit}
               </Text>
               <Text style={styles.quantity}>{item.quantity}</Text>
+              <Text style={styles.quantity}>{item.weight}</Text>
               <Text style={styles.amount}>
                 {item.amount.toFixed(2)} {item.unit}
               </Text>
@@ -223,22 +225,12 @@ const MyDocument = ({ invoice }: FactureProps) => {
           </View>
         </View>
 
-        <View
-          style={{
-            marginTop: 10,
-            width: "100%",
-            height: 1,
-            borderWidth: 0.5,
-            borderColor: "#000",
-          }}
-        ></View>
-
-        <View style={styles.footer}>
-          <View style={styles.footerContent}>
+        <View style={{marginTop: 5}}>
+        <View style={styles.footerContent}>
             <View style={styles.footerSection}>
               <Text style={styles.footerTitle}>Questions?</Text>
               <Text>
-                Email: contact@royalcargo.com{"\n"}Tél: +00225 05 64 91 92 16
+                Email: royalcargo225@gmail.com{"\n"}Tél: +00225 05 64 91 92 16
               </Text>
             </View>
             <View style={styles.footerSection}>
@@ -253,6 +245,16 @@ const MyDocument = ({ invoice }: FactureProps) => {
             </View>
           </View>
         </View>
+
+        <View
+          style={{
+            marginTop: 5,
+            width: "100%",
+            height: 1,
+            borderWidth: 0.5,
+            borderColor: "#000",
+          }}
+        ></View>
       </Page>
     </Document>
   );

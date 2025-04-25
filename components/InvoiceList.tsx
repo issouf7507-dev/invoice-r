@@ -37,6 +37,10 @@ export function InvoiceList({
   const [sortBy, setSortBy] = useState<"date" | "name" | "amount">("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
+
+  console.log(invoices);
+  
+
   const filteredInvoices = invoices
     .filter(
       (invoice) =>
@@ -129,6 +133,7 @@ export function InvoiceList({
                 Client {sortBy === "name" && (sortOrder === "asc" ? "↑" : "↓")}
               </TableHead>
               <TableHead>Téléphone</TableHead>
+              <TableHead>Poids</TableHead>
               <TableHead
                 className="text-right cursor-pointer"
                 onClick={() => toggleSort("amount")}
@@ -148,6 +153,9 @@ export function InvoiceList({
                   {invoice.clientName}
                 </TableCell>
                 <TableCell>{invoice.clientPhone}</TableCell>
+                <TableCell>
+                  {invoice.items.reduce((sum, item) => sum + item.weight, 0).toFixed(2)} kg
+                </TableCell>
                 <TableCell className="text-right">
                   {invoice.items
                     .reduce((sum, item) => sum + item.amount, 0)

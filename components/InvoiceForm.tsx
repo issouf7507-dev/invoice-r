@@ -20,12 +20,13 @@ export function InvoiceForm({ onSubmitAction }: InvoiceFormProps) {
   const [clientPhone, setClientPhone] = useState("");
   const [items, setItems] = useState<Invoice["items"]>([
     {
-      id: getRandomIntUniquePerDay(1, 100),
+      id: getRandomIntUniquePerDay(1, 1000),
       description: "",
       unit: "",
       quantity: 1,
       unitPrice: 0,
       amount: 0,
+      weight: 1,
     },
   ]);
 
@@ -33,12 +34,13 @@ export function InvoiceForm({ onSubmitAction }: InvoiceFormProps) {
     setItems([
       ...items,
       {
-        id: getRandomIntUniquePerDay(1, 100),
+        id: getRandomIntUniquePerDay(1, 1000),
         description: "",
         unit: "",
         quantity: 1,
         unitPrice: 0,
         amount: 0,
+        weight: 1,
       },
     ]);
   };
@@ -63,7 +65,7 @@ export function InvoiceForm({ onSubmitAction }: InvoiceFormProps) {
 
     if (field === "quantity" || field === "unitPrice") {
       newItems[index].amount =
-        Number(newItems[index].quantity) * Number(newItems[index].unitPrice);
+        Number(newItems[index].weight) * Number(newItems[index].unitPrice);
     }
 
     setItems(newItems);
@@ -142,11 +144,11 @@ export function InvoiceForm({ onSubmitAction }: InvoiceFormProps) {
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Line de la factures</h3>
+        <h3 className="text-lg font-semibold">Lignes de la facture</h3>
 
         <div className="border p-3 rounded-lg">
           {items.map((item, index) => (
-            <div key={index} className="grid grid-cols-6 gap-4 items-center">
+            <div key={index} className="grid grid-cols-7 gap-4 items-center">
               <div>
                 <Label className="mb-1">Description</Label>
                 <Input
@@ -178,8 +180,22 @@ export function InvoiceForm({ onSubmitAction }: InvoiceFormProps) {
                 <Input
                   type="number"
                   value={item.quantity}
+                  
                   onChange={(e) =>
                     updateItem(index, "quantity", Number(e.target.value))
+                  }
+                  required
+                />
+              </div>
+              <div>
+                <Label className="mb-1">Poids (kg)</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={item.weight}
+                  onChange={(e) =>
+                    updateItem(index, "weight", Number(e.target.value))
                   }
                   required
                 />
@@ -189,6 +205,7 @@ export function InvoiceForm({ onSubmitAction }: InvoiceFormProps) {
                 <Input
                   type="number"
                   value={item.unitPrice}
+                    min="0"
                   onChange={(e) =>
                     updateItem(index, "unitPrice", Number(e.target.value))
                   }
@@ -197,7 +214,7 @@ export function InvoiceForm({ onSubmitAction }: InvoiceFormProps) {
               </div>
               <div>
                 <Label className="mb-1">Montant</Label>
-                <Input type="number" value={item.amount} readOnly />
+                <Input type="number" value={item.amount}      min="0" readOnly />
               </div>
 
               {items.length > 1 && (
@@ -213,7 +230,10 @@ export function InvoiceForm({ onSubmitAction }: InvoiceFormProps) {
             Ajouter un article
           </Button>
 
-          <Button type="submit">Créer la facture</Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" type="button" onClick={() => window.location.href = "/invoices"}>Retour</Button>
+            <Button type="submit">Créer la facture</Button>
+          </div>
         </div>
       </div>
     </form>

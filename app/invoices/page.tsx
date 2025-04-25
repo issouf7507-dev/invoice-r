@@ -26,6 +26,7 @@ interface InvoiceItem {
   quantity: number;
   unitPrice: number;
   amount: number;
+  weight: number;
 }
 
 interface Invoice {

@@ -66,10 +66,10 @@ export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
         </div>
       </div>
 
-      <div className="bg-white p-8 rounded-lg shadow-sm print:shadow-none">
+      <div className="bg-white p-8 rounded-lg shadow-sm print:shadow-none dark:text-gray-400">
         <div className="grid grid-cols-2 gap-8 mb-8">
           <div>
-            <h2 className="text-lg font-semibold mb-2">
+            <h2 className="text-lg font-semibold mb-2 ">
               Informations du Client
             </h2>
             <p className="font-medium">{invoice.clientName}</p>
@@ -88,19 +88,21 @@ export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Description</TableHead>
-              <TableHead>Unité</TableHead>
-              <TableHead className="text-right">Quantité</TableHead>
-              <TableHead className="text-right">Prix unitaire</TableHead>
-              <TableHead className="text-right">Montant</TableHead>
+              <TableHead className="dark:text-gray-400">Description</TableHead>
+              <TableHead className="dark:text-gray-400">Unité</TableHead>
+              <TableHead className="text-right dark:text-gray-400">Quantité</TableHead>
+              <TableHead className="text-right dark:text-gray-400">Poids</TableHead>
+              <TableHead className="text-right dark:text-gray-400">Prix unitaire</TableHead>
+              <TableHead className="text-right dark:text-gray-400">Montant</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {invoice.items.map((item) => (
-              <TableRow key={item.id}>
+              <TableRow key={item.id} className="hover:text-black">
                 <TableCell>{item.description}</TableCell>
                 <TableCell>{item.unit}</TableCell>
                 <TableCell className="text-right">{item.quantity}</TableCell>
+                <TableCell className="text-right">{item.weight}</TableCell>
                 <TableCell className="text-right">
                   {item.unitPrice.toFixed(2)}
                 </TableCell>
@@ -112,10 +114,10 @@ export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
           </TableBody>
           <TableFooter>
             <TableRow>
-              <TableCell colSpan={4} className="text-right font-bold">
+              <TableCell colSpan={5} className="text-right font-bold text-black">
                 Total
               </TableCell>
-              <TableCell className="text-right font-bold">
+              <TableCell className="text-right font-bold text-black">
                 {total.toFixed(2)}
               </TableCell>
             </TableRow>
