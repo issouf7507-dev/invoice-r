@@ -157,7 +157,7 @@ const MyDocument = ({ invoice }: FactureProps) => {
           <View>
             <Image style={styles.logo} src={myam.src} />
             <Text style={styles.addressBlock}>
-              Abidajan, Côte d'Ivoire{"\n"}Tél: 0086 186 2097 5453 - 0086 188
+              Abidjan, Côte d'Ivoire{"\n"}Tél: 0086 186 2097 5453 - 0086 188
               0207 2454{"\n"}Tél: 00225 05 64 91 92 16
             </Text>
           </View>
@@ -237,8 +237,7 @@ const MyDocument = ({ invoice }: FactureProps) => {
 
           <View style={styles.totalContainer}>
             <Text style={styles.totalText}>
-              TOTAL : {formatNumber(invoice.paidAmount)}{" "}
-              {invoice.items[0]?.unit}
+              TOTAL :    {formatNumber(invoice.remainingAmount)} {invoice.items[0]?.unit}
             </Text>
           </View>
         </View>
