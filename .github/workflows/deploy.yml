@@ -74,8 +74,8 @@ jobs:
             pm2 stop facturer 2>/dev/null || true
             pm2 delete facturer 2>/dev/null || true
 
-            # Tuer tout processus utilisant le port 3008
-            lsof -ti:3008 | xargs kill -9 2>/dev/null || true
+            # Tuer tout processus utilisant le port 3009
+            lsof -ti:3009 | xargs kill -9 2>/dev/null || true
 
             # Démarrer le service PM2 sur le port 3009
             pm2 start npm --name "facturer" -- start -- -p 3009
