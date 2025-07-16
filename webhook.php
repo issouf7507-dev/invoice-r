@@ -2,7 +2,7 @@
 // Webhook pour déclencher le déploiement automatique
 // À placer sur votre serveur VPSd
 
-// Configuration
+// Configuration sw
 $secret = 'votre_secret_webhook'; // Changez ceci
 $project_dir = '/var/www/webapp/facturer';
 $deploy_script = $project_dir . '/deploy.sh';
