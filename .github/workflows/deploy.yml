@@ -87,4 +87,4 @@ jobs:
             cd /var/www/webapp/facturer
             ls -t backup-* | tail -n +6 | xargs -r rm -rf
 
-            echo "Déploiement terminé avec succès!  sw"
+            echo "Déploiement terminé avec succès! hhh sw"
