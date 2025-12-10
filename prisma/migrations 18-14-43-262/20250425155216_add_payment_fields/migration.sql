@@ -1,0 +1,20 @@
+-- AlterTable
+ALTER TABLE `Invoice` ADD COLUMN `isPaid` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `paidAmount` DOUBLE NOT NULL DEFAULT 0.0,
+    ADD COLUMN `remainingAmount` DOUBLE NOT NULL DEFAULT 0.0,
+    ADD COLUMN `totalAmount` DOUBLE NOT NULL DEFAULT 0.0;
+
+-- CreateTable
+CREATE TABLE `Payment` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `amount` DOUBLE NOT NULL,
+    `paymentDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `invoiceId` INTEGER NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `Payment` ADD CONSTRAINT `Payment_invoiceId_fkey` FOREIGN KEY (`invoiceId`) REFERENCES `Invoice`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

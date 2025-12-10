@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `InvoiceItem` ADD COLUMN `weight` DOUBLE NOT NULL DEFAULT 0.0;
