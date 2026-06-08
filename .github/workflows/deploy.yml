@@ -44,9 +44,27 @@ jobs:
           cp ecosystem.config.js deploy/
 
       - name: Set up SSH agent
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
+          SSH_KEY_PASSPHRASE: ${{ secrets.VPS_SSH_KEY_PASSPHRASE }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+          eval "$(ssh-agent -s)"
+          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> "$GITHUB_ENV"
+          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> "$GITHUB_ENV"
+
+          # Feed the passphrase to ssh-add non-interactively via SSH_ASKPASS
+          # (no TTY is available in CI, so the normal prompt would hang/fail).
+          ASKPASS_SCRIPT="$RUNNER_TEMP/askpass.sh"
+          printf '#!/bin/sh\necho "$SSH_KEY_PASSPHRASE"\n' > "$ASKPASS_SCRIPT"
+          chmod +x "$ASKPASS_SCRIPT"
+
+          SSH_ASKPASS="$ASKPASS_SCRIPT" SSH_ASKPASS_REQUIRE=force DISPLAY=: setsid ssh-add ~/.ssh/deploy_key
+
+          rm -f ~/.ssh/deploy_key "$ASKPASS_SCRIPT"
 
       - name: Add VPS to known_hosts
         run: ssh-keyscan -p ${{ secrets.VPS_PORT }} -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
