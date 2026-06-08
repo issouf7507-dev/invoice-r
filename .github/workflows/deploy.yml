@@ -5,86 +5,76 @@ on:
     branches: [dev-issouf-f]
   workflow_dispatch:
 
+env:
+  DEPLOY_PATH: /home/dev-issouf/apps/facturer
+  # Placeholder URL used only so `prisma generate` / `next build` can resolve
+  # the DATABASE_URL env var — no real DB connection is made at build time.
+  DATABASE_URL: "mysql://build:build@127.0.0.1:3306/build"
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
-          cache: "npm"
+          node-version: 24
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build application
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Build Next.js app
         run: npm run build
 
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Assemble standalone bundle
+        run: |
+          rm -rf deploy
+          mkdir -p deploy
+          cp -r .next/standalone/. deploy/
+          mkdir -p deploy/.next
+          cp -r .next/static deploy/.next/static
+          cp -r public deploy/public
+          cp ecosystem.config.js deploy/
+
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
         with:
-          host: 168.231.106.21
-          username: root
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: 22
+          ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
 
-          script: |
-            # Naviguer vers le répertoire du projet
-            cd /var/www/webapp/facturer
+      - name: Add VPS to known_hosts
+        run: ssh-keyscan -p ${{ secrets.VPS_PORT }} -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
-            # Sauvegarder l'ancienne version
-            if [ -d "current" ]; then
-              mv current backup-$(date +%Y%m%d-%H%M%S)
-            fi
+      - name: Create release directory on VPS
+        id: release
+        run: |
+          RELEASE="release-$(date +%Y%m%d%H%M%S)-${GITHUB_SHA::8}"
+          echo "name=$RELEASE" >> "$GITHUB_OUTPUT"
+          ssh -p ${{ secrets.VPS_PORT }} ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+            "mkdir -p $DEPLOY_PATH/releases/$RELEASE"
 
-            # Créer le répertoire de déploiement
-            mkdir -p current
+      - name: Upload build to VPS
+        run: |
+          rsync -az --delete -e "ssh -p ${{ secrets.VPS_PORT }}" \
+            deploy/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:$DEPLOY_PATH/releases/${{ steps.release.outputs.name }}/
 
-            # Cloner le code depuis GitHub
-            git clone -b dev-issouf-f https://github.com/${{ github.repository }}.git temp-deploy
-
-            # Copier les fichiers nécessaires
-            cp -r temp-deploy/* current/
-            cp -r temp-deploy/.* current/ 2>/dev/null || true
-
-            # Nettoyer
-            rm -rf temp-deploy
-
-            # Naviguer vers le répertoire de déploiement
-            cd current
-
-            # Installer les dépendances
-            npm ci
-
-            # Construire l'application
-            npm run build
-
-            # Vérifier que le build existe
-            if [ ! -d ".next" ]; then
-              echo "Erreur: Le build .next n'existe pas!"
-              exit 1
-            fi
-
-            # Arrêter le processus PM2 existant s'il existe
-            pm2 stop facturer 2>/dev/null || true
-            pm2 delete facturer 2>/dev/null || true
-
-            # Tuer tout processus utilisant le port 3009
-            lsof -ti:3009 | xargs kill -9 2>/dev/null || true
-
-            # Démarrer le service PM2 sur le port 3009
-            pm2 start npm --name "facturer" -- start -- -p 3009
-
-            # Sauvegarder la configuration PM2
-            pm2 save
-
-            # Nettoyer les anciennes sauvegardes (garder les 5 plus récentes)
-            cd /var/www/webapp/facturer
-            ls -t backup-* | tail -n +6 | xargs -r rm -rf
-
-            echo "Déploiement terminé avec succès! hhh sw"
+      - name: Activate release & restart app
+        env:
+          RELEASE: ${{ steps.release.outputs.name }}
+        run: |
+          ssh -p ${{ secrets.VPS_PORT }} ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            set -e &&
+            mkdir -p $DEPLOY_PATH/logs &&
+            ln -sfn $DEPLOY_PATH/shared/.env $DEPLOY_PATH/releases/$RELEASE/.env &&
+            ln -sfn $DEPLOY_PATH/releases/$RELEASE $DEPLOY_PATH/current &&
+            cd $DEPLOY_PATH/current &&
+            pm2 startOrReload ecosystem.config.js --env production &&
+            pm2 save &&
+            cd $DEPLOY_PATH/releases && ls -1dt release-*/ | tail -n +6 | xargs -r rm -rf
+          "

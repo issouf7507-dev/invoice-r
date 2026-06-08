@@ -112,7 +112,7 @@ export function InvoiceForm({ onSubmitAction }: InvoiceFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-4 grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div>
           <Label htmlFor="clientName" className="mb-1">
             Nom du client
@@ -154,9 +154,12 @@ export function InvoiceForm({ onSubmitAction }: InvoiceFormProps) {
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Lignes de la facture</h3>
 
-        <div className="border p-3 rounded-lg">
+        <div className="space-y-4 rounded-lg border p-4">
           {items.map((item, index) => (
-            <div key={index} className="grid grid-cols-7 gap-4 items-center">
+            <div
+              key={index}
+              className="grid grid-cols-2 gap-4 border-b pb-4 last:border-b-0 last:pb-0 sm:grid-cols-3 lg:grid-cols-7 lg:items-end"
+            >
               <div>
                 <Label className="mb-1">Description</Label>
                 <Input
@@ -173,7 +176,7 @@ export function InvoiceForm({ onSubmitAction }: InvoiceFormProps) {
                 <select
                   value={item.unit}
                   onChange={(e) => updateItem(index, "unit", e.target.value)}
-                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
                   required
                 >
                   <option value="">Sélectionner une unité</option>
@@ -225,21 +228,33 @@ export function InvoiceForm({ onSubmitAction }: InvoiceFormProps) {
               </div>
 
               {items.length > 1 && (
-                <Button type="button" onClick={() => removeItem(item.id)}>
-                  <Trash />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  onClick={() => removeItem(item.id)}
+                  aria-label="Supprimer l'article"
+                >
+                  <Trash className="size-4" />
                 </Button>
               )}
             </div>
           ))}
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <Button type="button" variant="outline" onClick={addItem}>
+          + Ajouter un article
+        </Button>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <Label className="mb-1">Montant total</Label>
             <Input
               type="number"
               value={items.reduce((sum, item) => sum + item.amount, 0)}
               readOnly
+              className="bg-muted font-medium"
             />
           </div>
           <div>
@@ -253,11 +268,7 @@ export function InvoiceForm({ onSubmitAction }: InvoiceFormProps) {
           </div>
         </div>
 
-        <div className="flex items-center justify-between">
-          <Button type="button" onClick={addItem}>
-            Ajouter un article
-          </Button>
-
+        <div className="flex items-center justify-end border-t pt-6">
           <div className="flex items-center gap-2">
             <Button
               variant="outline"

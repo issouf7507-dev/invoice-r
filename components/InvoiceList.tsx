@@ -13,14 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Invoice } from "@/types/invoice";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
+import { Search } from "lucide-react";
 
 interface InvoiceListProps {
   invoices: Invoice[];
@@ -31,7 +24,6 @@ export function InvoiceList({
   invoices,
   onSelectInvoiceAction,
 }: InvoiceListProps) {
-  const { setTheme } = useTheme();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState<"date" | "name" | "amount">("date");
@@ -79,46 +71,31 @@ export function InvoiceList({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Historique des Factures</h2>
-
-        <div className="flex items-center gap-3">
-          <Button onClick={() => router.push("/invoices/new")}>
-            Nouvelle Facture
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
-                <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                <span className="sr-only">Toggle theme</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setTheme("light")}>
-                Light
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("dark")}>
-                Dark
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("system")}>
-                System
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-xl font-semibold">Historique des factures</h2>
+          <p className="text-sm text-muted-foreground">
+            {filteredInvoices.length} facture
+            {filteredInvoices.length > 1 ? "s" : ""} au total
+          </p>
         </div>
+
+        <Button onClick={() => router.push("/invoices/new")}>
+          Nouvelle facture
+        </Button>
       </div>
 
-      <div className="flex gap-4">
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="Rechercher par nom, adresse ou téléphone..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-1"
+          className="pl-9"
         />
       </div>
 
-      <div className="rounded-md border">
+      <div className="overflow-hidden rounded-lg border bg-card shadow-sm">
         <Table>
           <TableHeader>
             <TableRow>
@@ -149,6 +126,16 @@ export function InvoiceList({
             </TableRow>
           </TableHeader>
           <TableBody>
+            {filteredInvoices.length === 0 && (
+              <TableRow>
+                <TableCell
+                  colSpan={9}
+                  className="py-12 text-center text-muted-foreground"
+                >
+                  Aucune facture ne correspond à votre recherche.
+                </TableCell>
+              </TableRow>
+            )}
             {filteredInvoices.map((invoice) => (
               <TableRow key={invoice.id}>
                 <TableCell>
@@ -178,10 +165,10 @@ export function InvoiceList({
                 </TableCell>
                 <TableCell className="text-right">
                   <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                       invoice.isPaid
-                        ? "bg-green-100 text-green-800"
-                        : "bg-yellow-100 text-yellow-800"
+                        ? "bg-success/15 text-success"
+                        : "bg-warning/20 text-warning-foreground dark:bg-warning/15 dark:text-warning"
                     }`}
                   >
                     {invoice.isPaid ? "Soldée" : "En attente"}

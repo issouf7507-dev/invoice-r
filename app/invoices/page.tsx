@@ -110,26 +110,27 @@ export default function InvoicesPage() {
     );
   };
 
-  const handleSearch = () => {
-    filterInvoices();
-    setIsOpen(false);
-  };
+  const hasDateFilter = Boolean(startDate || endDate);
 
   return (
-    <main className="min-h-screen p-8">
-      <div className="mb-8 flex justify-between items-center">
-        <div className=" flex items-end gap-4">
-          <Button
-            onClick={() => {
-              setIsOpen(true);
-            }}
-            variant="outline"
-          >
-            Rechercher
-          </Button>
-
-          {isOpen && (
-            <div className="grid grid-cols-3 gap-4 items-end">
+    <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(hasDateFilter && "border-primary text-primary")}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {hasDateFilter
+                ? `${startDate ? format(startDate, "PPP", { locale: fr }) : "…"} – ${
+                    endDate ? format(endDate, "PPP", { locale: fr }) : "…"
+                  }`
+                : "Filtrer par date"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-4" align="start">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
               <div className="grid gap-2">
                 <label className="text-sm font-medium">Date de début</label>
                 <Popover>
@@ -190,23 +191,26 @@ export default function InvoicesPage() {
                   </PopoverContent>
                 </Popover>
               </div>
-              <div className="grid gap-2">
-                <Button variant="outline" onClick={filterInvoicesReset}>
-                  <RotateCcw />
-                </Button>
-              </div>
+              <Button
+                variant="ghost"
+                onClick={filterInvoicesReset}
+                aria-label="Réinitialiser les dates"
+              >
+                <RotateCcw className="size-4" />
+              </Button>
             </div>
-          )}
-        </div>
+          </PopoverContent>
+        </Popover>
 
-        <div className="flex gap-4">
+        <div className="flex gap-3">
           <PDFButton
-            // invoices={invoices}
             invoices={filteredInvoices}
             startDate={startDate}
             endDate={endDate}
           />
-          <Button onClick={exportToExcel}>Exporter en Excel</Button>
+          <Button variant="outline" onClick={exportToExcel}>
+            Exporter en Excel
+          </Button>
         </div>
       </div>
       <InvoiceList

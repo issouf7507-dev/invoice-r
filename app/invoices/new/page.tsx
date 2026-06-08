@@ -35,18 +35,16 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen p-8">
-      <h1 className="text-3xl font-bold mb-8 text-center">
-        Gestionnaire de Factures
-      </h1>
+    <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold">Nouvelle facture</h1>
+        <p className="text-sm text-muted-foreground">
+          Renseignez les informations du client et les articles à facturer.
+        </p>
+      </div>
 
-      <div className="max-w-4xl mx-auto">
+      <div className="rounded-xl border bg-card p-6 text-card-foreground shadow-sm sm:p-8">
         <InvoiceForm onSubmitAction={handleCreateInvoice} />
-        <div className="mt-4">
-          {/* <Button variant="outline" onClick={() => setIsCreating(false)}>
-            Annuler
-          </Button> */}
-        </div>
       </div>
     </main>
   );

@@ -48,16 +48,22 @@ export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Détails de la Facture</h1>
-        <div className="flex gap-2">
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold">Détails de la facture</h1>
+          <p className="text-sm text-muted-foreground">
+            Facture #{invoice.id} ·{" "}
+            {new Date(invoice.createdAt).toLocaleDateString()}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
           <PDFDownloadLink
             document={<MyDocument invoice={invoice} />}
             fileName={`facture-${invoice.id}.pdf`}
-            className="bg-transparent border  text-base font-bold py-1 px-4 rounded"
+            className="inline-flex h-9 items-center justify-center gap-2 rounded-md border bg-background px-4 text-sm font-medium shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground"
           >
-            {({ blob, url, loading, error }) =>
+            {({ loading }) =>
               loading ? "Génération du PDF..." : "Télécharger la facture"
             }
           </PDFDownloadLink>
@@ -70,24 +76,33 @@ export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
         </div>
       </div>
 
-      <div className="bg-white p-8 rounded-lg shadow-sm print:shadow-none dark:text-gray-400">
-        <div className="grid grid-cols-2 gap-8 mb-8">
+      <span
+        className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${
+          invoice.isPaid
+            ? "bg-success/15 text-success"
+            : "bg-warning/20 text-warning-foreground dark:bg-warning/15 dark:text-warning"
+        }`}
+      >
+        {invoice.isPaid ? "Soldée" : "En attente de paiement"}
+      </span>
+
+      <div className="rounded-xl border bg-card p-8 text-card-foreground shadow-sm print:shadow-none">
+        <div className="mb-8 grid grid-cols-1 gap-8 sm:grid-cols-2">
           <div>
-            <h2 className="text-lg font-semibold mb-2 ">
-              Informations du Client
+            <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              Informations du client
             </h2>
             <p className="font-medium">{invoice.clientName}</p>
-            <p>{invoice.clientAddress}</p>
-            <p>{invoice.clientPhone}</p>
+            <p className="text-muted-foreground">{invoice.clientAddress}</p>
+            <p className="text-muted-foreground">{invoice.clientPhone}</p>
           </div>
-          <div className="text-right">
-            <h2 className="text-lg font-semibold mb-2">
-              Détails de la Facture
+          <div className="sm:text-right">
+            <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              Détails de la facture
             </h2>
-            <p>Numéro: #{invoice.id}</p>
-            <p>Date: {new Date(invoice.createdAt).toLocaleDateString()}</p>
-            <p>
-              Statut: {invoice.isPaid ? "Soldée" : "En attente de paiement"}
+            <p className="text-muted-foreground">Numéro: #{invoice.id}</p>
+            <p className="text-muted-foreground">
+              Date: {new Date(invoice.createdAt).toLocaleDateString()}
             </p>
           </div>
         </div>
@@ -95,35 +110,25 @@ export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="dark:text-gray-400">Description</TableHead>
-              <TableHead className="dark:text-gray-400">Unité</TableHead>
-              <TableHead className="text-right dark:text-gray-400">
-                Quantité
-              </TableHead>
-              <TableHead className="text-right dark:text-gray-400">
-                Poids
-              </TableHead>
-              <TableHead className="text-right dark:text-gray-400">
-                Prix unitaire
-              </TableHead>
-              <TableHead className="text-right dark:text-gray-400">
-                Montant
-              </TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead>Unité</TableHead>
+              <TableHead className="text-right">Quantité</TableHead>
+              <TableHead className="text-right">Poids</TableHead>
+              <TableHead className="text-right">Prix unitaire</TableHead>
+              <TableHead className="text-right">Montant</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {invoice.items.map((item) => (
-              <TableRow key={item.id} className="hover:text-black">
+              <TableRow key={item.id}>
                 <TableCell>{item.description}</TableCell>
                 <TableCell>{item.unit}</TableCell>
                 <TableCell className="text-right">{item.quantity}</TableCell>
                 <TableCell className="text-right">{item.weight}</TableCell>
                 <TableCell className="text-right">
-                  {/* {item.unitPrice.toFixed(2)} */}
                   {formatNumber(item.unitPrice)}
                 </TableCell>
                 <TableCell className="text-right">
-                  {/* {item.amount.toFixed(2)} */}
                   {formatNumber(item.amount)}
                 </TableCell>
               </TableRow>
@@ -131,38 +136,26 @@ export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
           </TableBody>
           <TableFooter>
             <TableRow>
-              <TableCell
-                colSpan={5}
-                className="text-right font-bold text-black"
-              >
+              <TableCell colSpan={5} className="text-right font-semibold">
                 Total
               </TableCell>
-              <TableCell className="text-right font-bold text-black">
-                {/* {invoice.totalAmount.toFixed(2)} */}
+              <TableCell className="text-right font-semibold">
                 {formatNumber(invoice.totalAmount)}
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell
-                colSpan={5}
-                className="text-right font-bold text-black"
-              >
+              <TableCell colSpan={5} className="text-right font-semibold">
                 Montant payé
               </TableCell>
-              <TableCell className="text-right font-bold text-black">
-                {/* {invoice.paidAmount.toFixed(2)} */}
+              <TableCell className="text-right font-semibold">
                 {formatNumber(invoice.paidAmount)}
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell
-                colSpan={5}
-                className="text-right font-bold text-black"
-              >
+              <TableCell colSpan={5} className="text-right font-semibold">
                 Reste à payer
               </TableCell>
-              <TableCell className="text-right font-bold text-black">
-                {/* {invoice.remainingAmount.toFixed(2)} */}
+              <TableCell className="text-right font-semibold">
                 {formatNumber(invoice.remainingAmount)}
               </TableCell>
             </TableRow>
@@ -171,7 +164,7 @@ export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
 
         {invoice.payments && invoice.payments.length > 0 && (
           <div className="mt-8">
-            <h3 className="text-lg font-semibold mb-4">
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
               Historique des paiements
             </h3>
             <Table>
@@ -197,7 +190,7 @@ export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
           </div>
         )}
 
-        <div className="mt-8 text-center text-sm text-gray-500 print:hidden">
+        <div className="mt-8 text-center text-sm text-muted-foreground print:hidden">
           <p>
             Cette facture a été générée le {new Date().toLocaleDateString()}
           </p>

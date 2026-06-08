@@ -47,10 +47,10 @@ export default function InvoiceDetailPage({
 
   if (loading) {
     return (
-      <main className="min-h-screen p-8 flex items-center justify-center">
-        <div className="flex justify-center items-center flex-col">
+      <main className="flex flex-1 items-center justify-center p-8">
+        <div className="flex flex-col items-center gap-3 text-muted-foreground">
+          <Loader2 className="size-6 animate-spin" />
           <p>Chargement...</p>
-          <Loader2 />
         </div>
       </main>
     );
@@ -58,16 +58,14 @@ export default function InvoiceDetailPage({
 
   if (!invoice) {
     return (
-      <main className="min-h-screen p-8">
-        <div className="flex justify-center items-center">
-          <p>Facture non trouvée</p>
-        </div>
+      <main className="flex flex-1 items-center justify-center p-8">
+        <p className="text-muted-foreground">Facture non trouvée</p>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen p-8">
+    <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
       <InvoiceDetail invoice={invoice} />
     </main>
   );
